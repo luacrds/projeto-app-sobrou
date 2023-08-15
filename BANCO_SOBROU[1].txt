@@ -1,0 +1,160 @@
+O Comando -- Comenta apenas linhas, fazendo desnecessario o uso de // que polui mais o codigo e comenta um bloco de texto e não uma só linha.
+
+
+-- CRIAÇÃO DA DATABASE E SUAS TABELAS
+
+
+CREATE DATABASE SistemaDelivery;
+
+
+USE SistemaDelivery;
+
+
+CREATE TABLE Usuario (
+    usuario_id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    telefone VARCHAR(15)
+);
+
+
+CREATE TABLE Empresa (
+    empresa_id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_empresa VARCHAR(100),
+    telefone_empresa VARCHAR(15),
+    endereco_empresa VARCHAR(255),
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id)
+);
+
+
+CREATE TABLE Endereco (
+    endereco_id INT AUTO_INCREMENT PRIMARY KEY,
+    logradouro VARCHAR(255),
+    numero VARCHAR(20),
+    complemento VARCHAR(100),
+    cidade VARCHAR(100),
+    estado VARCHAR(50),
+    cep VARCHAR(10)
+);
+
+
+CREATE TABLE Produto (
+    produto_id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_produto VARCHAR(100),
+    descricao TEXT,
+    preco DECIMAL(10, 2)
+);
+
+
+CREATE TABLE Pedido (
+    pedido_id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT,
+    empresa_id INT,
+    endereco_id INT,
+    data_pedido DATETIME,
+    status VARCHAR(50),
+    FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id),
+    FOREIGN KEY (empresa_id) REFERENCES Empresa(empresa_id),
+    FOREIGN KEY (endereco_id) REFERENCES Endereco(endereco_id)
+);
+
+
+CREATE TABLE ItemPedido (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    pedido_id INT,
+    produto_id INT,
+    quantidade INT,
+    FOREIGN KEY (pedido_id) REFERENCES Pedido(pedido_id),
+    FOREIGN KEY (produto_id) REFERENCES Produto(produto_id)
+);
+
+
+-- CRIAÇÃO DAS CHAVES ESTRANGEIRAS (ERROS PODEM ACONTECER CRIANDO TUDO JUNTO, CASO ACONTEÇA USE ESSES COMANDOS)
+
+-- Chave estrangeira na tabela Empresa referenciando Usuario
+ALTER TABLE Empresa
+ADD FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id);
+
+-- Chave estrangeira na tabela Pedido referenciando Usuario
+ALTER TABLE Pedido
+ADD FOREIGN KEY (usuario_id) REFERENCES Usuario(usuario_id);
+
+-- Chave estrangeira na tabela Pedido referenciando Empresa
+ALTER TABLE Pedido
+ADD FOREIGN KEY (empresa_id) REFERENCES Empresa(empresa_id);
+
+-- Chave estrangeira na tabela Pedido referenciando Endereco
+ALTER TABLE Pedido
+ADD FOREIGN KEY (endereco_id) REFERENCES Endereco(endereco_id);
+
+-- Chave estrangeira na tabela ItemPedido referenciando Pedido
+ALTER TABLE ItemPedido
+ADD FOREIGN KEY (pedido_id) REFERENCES Pedido(pedido_id);
+
+-- Chave estrangeira na tabela ItemPedido referenciando Produto
+ALTER TABLE ItemPedido
+ADD FOREIGN KEY (produto_id) REFERENCES Produto(produto_id);
+
+
+
+-- INSERSÃO DE DADOS 
+
+
+-- Inserção de Dados na Tabela Usuario
+INSERT INTO Usuario (nome, email, telefone)
+VALUES
+    ('João Silva', 'joao@email.com', '(11) 98765-4321'),
+    ('Maria Santos', 'maria@email.com', '(21) 99999-8888'),
+    ('Pedro Souza', 'pedro@email.com', '(31) 55555-6666'),
+    ('Ana Lima', 'ana@email.com', '(41) 77777-8888'),
+    ('Carlos Almeida', 'carlos@email.com', '(51) 33333-4444');
+
+-- Inserção de Dados na Tabela Empresa
+INSERT INTO Empresa (nome_empresa, telefone_empresa, endereco_empresa, usuario_id)
+VALUES
+    ('Restaurante A', '(11) 2345-6789', 'Rua A, 123', 1),
+    ('Pizzaria B', '(21) 4567-8901', 'Avenida B, 456', 2),
+    ('Lanchonete C', '(31) 5678-9012', 'Rua C, 789', 3),
+    ('Restaurante D', '(41) 6789-0123', 'Avenida D, 1011', 4),
+    ('Pizzaria E', '(51) 7890-1234', 'Rua E, 1213', 5);
+
+-- Inserção de Dados na Tabela Endereco
+INSERT INTO Endereco (logradouro, numero, complemento, cidade, estado, cep)
+VALUES
+    ('Rua A', '123', 'Apto 101', 'São Paulo', 'SP', '12345-678'),
+    ('Avenida B', '456', 'Casa', 'Rio de Janeiro', 'RJ', '23456-789'),
+    ('Rua C', '789', 'Sala 2', 'Belo Horizonte', 'MG', '34567-890'),
+    ('Avenida D', '1011', 'Loja 5', 'Curitiba', 'PR', '45678-901'),
+    ('Rua E', '1213', 'Andar 3', 'Porto Alegre', 'RS', '56789-012');
+
+-- Inserção de Dados na Tabela Produto
+INSERT INTO Produto (nome_produto, descricao, preco)
+VALUES
+    ('Pizza Calabresa', 'Deliciosa pizza de calabresa com queijo derretido.', 25.99),
+    ('X-Burger', 'Hambúrguer suculento com queijo, alface, tomate e maionese.', 12.50),
+    ('Coca-Cola 2L', 'Refrigerante Coca-Cola de 2 litros.', 8.00),
+    ('Sushi Combo', 'Combo de sushi variado com salmão, atum e camarão.', 30.00),
+    ('Batata Frita', 'Porção de batata frita crocante.', 10.00);
+
+-- Inserção de Dados na Tabela Pedido
+INSERT INTO Pedido (usuario_id, empresa_id, endereco_id, data_pedido, status)
+VALUES
+    (1, 1, 1, NOW(), 'Pendente'),
+    (2, 2, 2, NOW(), 'Em andamento'),
+    (3, 3, 3, NOW(), 'Entregue'),
+    (4, 4, 4, NOW(), 'Pendente'),
+    (5, 5, 5, NOW(), 'Em andamento');
+
+-- Inserção de Dados na Tabela ItemPedido
+INSERT INTO ItemPedido (pedido_id, produto_id, quantidade)
+VALUES
+    (1, 1, 2),
+    (1, 3, 3),
+    (2, 2, 1),
+    (3, 4, 2),
+    (4, 5, 1);
+
+
+
+
